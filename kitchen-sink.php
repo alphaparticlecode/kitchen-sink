@@ -4,7 +4,7 @@
  * Plugin URI:        https://wordpress.org/plugins/kitchen-sink/
  * Description:       Generates a "kitchen sink" page with examples of Gutenberg block implementations.
  * Version:           1.0
- * Requires at least: 6.0
+ * Requires at least: 5.6
  * Requires PHP:      7.2
  * Author:            Alpha Particle
  * Author URI:        https://alphaparticle.com/
