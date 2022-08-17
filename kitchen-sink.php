@@ -14,5 +14,7 @@
  */
 
 require_once 'classes/class-dashboard-widget.php';
+require_once 'classes/class-page-generation.php';
 
-$widget = Dashboard_Widget::get_instance();
+$widget   = Dashboard_Widget::get_instance();
+$generate = Page_Generation::get_instance();
