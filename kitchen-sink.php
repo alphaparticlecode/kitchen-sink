@@ -12,3 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       kitchen-sink
  */
+
+require_once 'classes/class-dashboard-widget.php';
+
+$widget = Dashboard_Widget::get_instance();
