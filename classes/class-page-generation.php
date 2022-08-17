@@ -1,5 +1,8 @@
 <?php
 
+// TO-DO: Fix the weird HTML entities problem
+// TO-DO: Add block titles and page links surrounding each block
+// TO-DO: Styling of kitchen sink page (CSS, maybe custom template)
 
 class Page_Generation {
 	/**
@@ -47,7 +50,13 @@ class Page_Generation {
 				], false, true );
 			}
 
-			$blocks = [];
+			
+			// TO-DO: Hardcode h1-h6 and p blocks in here
+			$blocks = [
+
+			];
+			
+
 			// Grab the IDs for every page
 			$pages = new WP_Query([
 				'post_type'      => 'page',
@@ -61,7 +70,6 @@ class Page_Generation {
 				$page_blocks      = parse_blocks( $page->post_content );
 				$page_block_names = wp_list_pluck( $page_blocks, 'blockName', null );
 
-				// Remove empty items and make the array unique
 				$page_block_names = array_unique( array_filter( $page_block_names ) );
 
 				foreach( $page_block_names as $page_block_name ) {
@@ -86,7 +94,7 @@ class Page_Generation {
 					];
 				}
 			}
-			
+
 			$all_blocks_markup = implode(' ', wp_list_pluck( $blocks, 'markup', null ) );
 
 			wp_update_post( [
