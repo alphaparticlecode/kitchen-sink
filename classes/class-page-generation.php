@@ -1,9 +1,5 @@
 <?php
 
-// TO-DO: Fix the weird HTML entities problem
-// TO-DO: Add block titles and page links surrounding each block
-// TO-DO: Styling of kitchen sink page (CSS, maybe custom template)
-
 class Page_Generation {
 	/**
 	 * Static property to hold our singleton instance
@@ -55,12 +51,12 @@ class Page_Generation {
 			$blocks = [
 
 			];
-			
 
 			// Grab the IDs for every page
 			$pages = new WP_Query([
 				'post_type'      => 'page',
 				'posts_per_page' => -1,
+				'post__not_in'   => [ $kitchen_sink_page->ID ],
 				'fields'         => 'ids'
 			]);
 
