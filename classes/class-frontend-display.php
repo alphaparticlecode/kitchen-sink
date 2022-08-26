@@ -36,16 +36,14 @@ class Frontend_Display {
 			return $content;
 		}
 
-		// $content = str_replace( 'u002d\\u002d', '--', $content );
-		// $content = str_replace( 'u003c', '<', $content );
-		// $content = str_replace( 'u003e', '>', $content );
-		// $content = str_replace( 'u0026', '&', $content );
-		// $content = str_replace( 'u0022', '"', $content );
-		// $content = str_replace( '&#8230;', '...', $content );
-		// $content = str_replace( '>rn<', '', $content );
+		$content = str_replace( 'u002d\\u002d', '--', $content );
+		$content = str_replace( 'u003c', '<', $content );
+		$content = str_replace( 'u003e', '>', $content );
+		$content = str_replace( 'u0026', '&', $content );
+		$content = str_replace( 'u0022', '"', $content );
+		$content = str_replace( '&#8230;', '...', $content );
+		$content = str_replace( '>rn<', '', $content );
 
-
-
-		return json_decode( json_encode( $content ) );
+		return $content;
 	}
 }
