@@ -118,13 +118,6 @@ class Page_Generation {
     				'ID' => $kitchen_sink_page->ID
     			]
     		);
-
-			// wp_update_post( [
-			// 	'ID'           => $kitchen_sink_page->ID,
-			// 	'post_content' => $all_blocks_markup
-			// ], false, true );
-
-			kses_init_filters();
     	}
 	}
 }
