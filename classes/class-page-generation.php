@@ -79,8 +79,23 @@ class Page_Generation {
 
 					$block_index = array_search($page_block_name, array_column($page_blocks, 'blockName'));
 					$block_instance = $page_blocks[$block_index];
+					$block_id = $block_instance['attrs']['id'];
 
-					$block_markup = serialize_block($block_instance);
+					// Since serialize_block wasn't working for us, we need
+					// to regex into the post content and grab all blocks of
+					// the type we're looking for
+					preg_match_all("/(<!-- wp:" . str_replace("/", "\/", $block_instance['blockName']) . " .*?\/-->)/s", $page->post_content, $matches);
+
+					$block_markup = '';
+
+					// To make sure we only get the markup of the particular block
+					// instance that we're looking for, check to see if that ID is
+					// found in the block
+					foreach( $matches as $match ) {
+						if( false !== strpos($match, $block_id ) ) {
+							$block_markup = $match[0];
+						}
+					}
 
 					$blocks[] = [
 						'name'        => $page_block_name,
@@ -93,10 +108,23 @@ class Page_Generation {
 
 			$all_blocks_markup = implode(' ', wp_list_pluck( $blocks, 'markup', null ) );
 
-			wp_update_post( [
-				'ID'           => $kitchen_sink_page->ID,
-				'post_content' => $all_blocks_markup
-			], false, true );
+			global $wpdb;
+			$wpdb->update(
+				'wp_posts',
+				[
+        			'post_content' => $all_blocks_markup
+    			],
+    			[
+    				'ID' => $kitchen_sink_page->ID
+    			]
+    		);
+
+			// wp_update_post( [
+			// 	'ID'           => $kitchen_sink_page->ID,
+			// 	'post_content' => $all_blocks_markup
+			// ], false, true );
+
+			kses_init_filters();
     	}
 	}
 }
