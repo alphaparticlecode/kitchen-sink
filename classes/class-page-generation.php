@@ -45,7 +45,6 @@ class Page_Generation {
 					'post_type'    => 'page',
 				], false, true );
 			}
-
 			
 			$core_blocks = [
 				[
@@ -105,7 +104,8 @@ class Page_Generation {
 				'post_type'      => 'page',
 				'posts_per_page' => -1,
 				'post__not_in'   => [ $kitchen_sink_page->ID ],
-				'fields'         => 'ids'
+				'fields'         => 'ids',
+				'post_status'    => 'publish',
 			]);
 
 			foreach( $pages->posts as $page_id ) {
@@ -147,10 +147,6 @@ class Page_Generation {
 
 					$block_index = array_search($page_block_name, array_column($page_blocks, 'blockName'));
 					$block_instance = $page_blocks[$block_index];
-		            $page_block_title = str_replace('acf/','',$page_block_name);
-		            $page_block_title = str_replace('-',' ',$page_block_title);
-		            $page_block_title = ucwords($page_block_title);
-		            $page_block_title = "<!-- wp:heading --><h2>" . $page_block_title . "</h2><!-- /wp:heading -->";
 
 		            if( false !== strpos($page_block_name, 'core/' ) ) {
 		            	$core_block_names = wp_list_pluck( $core_blocks, 'name', null );
@@ -158,7 +154,7 @@ class Page_Generation {
 						if( ! in_array($page_block_name, $core_block_names ) ) {
 							$core_blocks[] = [
 								'name'        => $page_block_name,
-								'markup'      => $page_block_title . $block_markup,
+								'markup'      => $block_markup,
 								'page'        => $page_id,
 								'other_pages' => []
 							];
@@ -166,7 +162,7 @@ class Page_Generation {
 			        } else {
 		            	$custom_blocks[] = [
 							'name'        => $page_block_name,
-							'markup'      => $page_block_title . $block_markup,
+							'markup'      => $block_markup,
 							'page'        => $page_id,
 							'other_pages' => []
 						];
@@ -183,6 +179,19 @@ class Page_Generation {
 
 			$blocks = array_merge($core_blocks, $custom_blocks);
 
+			$blocks = array_map(function($block){
+				$page_block_title = str_replace('acf/','',$block['name']);
+	            $page_block_title = str_replace('-',' ',$page_block_title);
+	            $page_block_title = ucwords($page_block_title);
+	            $page_block_title = "<!-- wp:heading --><h2>" . $page_block_title . "</h2><!-- /wp:heading -->";
+
+	            $block_instance_links = $this->generate_block_instance_links($block);
+
+	            $block['markup'] = $page_block_title . $block_instance_links . $block['markup'];
+
+	            return $block;
+			}, $blocks);
+
 			$all_blocks_markup = implode(' ', wp_list_pluck( $blocks, 'markup', null ) );
 
 			global $wpdb;
@@ -196,5 +205,37 @@ class Page_Generation {
     			]
     		);
     	}
+	}
+
+	public function generate_block_instance_links( $block ) {
+		if( -1 === $block['page'] ) {
+			return '';
+		}
+
+		$block_page_id = $block['page'];
+
+		$link_markup = '<!-- wp:paragraph --><p>This block appears on the <a href="' . get_the_permalink( $block_page_id ) . '">' . get_the_title( $block_page_id ) . '</a> page';
+
+		$expanded_markup = [];
+
+		if( count( $block['other_pages'] ) > 0 ) {
+			$link_markup .= ' and ' . count( $block['other_pages'] ) . ' others <span class="view-all-instances" style="cursor:pointer">(expand)</span>';
+
+			foreach( $block['other_pages'] as $other_page ) {
+				$expanded_markup[] = "<a href='" . get_the_permalink( $other_page ) . "'>" . get_the_title( $other_page )  . '</a>';
+			}
+
+			$expanded_markup = '<div style="display:none;" class="other-pages-list">' . implode(', ', $expanded_markup) . '</div>';
+		}
+
+		$link_markup .= '</p>';
+
+		if( count( $block['other_pages'] ) > 0 ) {
+			$link_markup .= $expanded_markup;
+		}
+
+		$link_markup .= '<!-- /wp:paragraph -->';
+
+		return $link_markup;
 	}
 }

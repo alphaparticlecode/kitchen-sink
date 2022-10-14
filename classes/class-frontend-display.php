@@ -13,6 +13,7 @@ class Frontend_Display {
 	 */
 	private function __construct() {
 		add_filter( 'the_content', [ $this, 'filter_html_special_chars' ], 99 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
 	}
 
 	/**
@@ -45,5 +46,9 @@ class Frontend_Display {
 		$content = str_replace( '>rn<', '', $content );
 
 		return $content;
+	}
+
+	public function enqueue_frontend_scripts() {
+		wp_enqueue_script( 'kitchen-sink-display', plugins_url( 'kitchen-sink' ) . '/js/kitchen-sink.js', [], '1.0', true );
 	}
 }
