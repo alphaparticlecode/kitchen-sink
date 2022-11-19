@@ -132,7 +132,12 @@ class Page_Generation {
 					// Since serialize_block wasn't working for us, we need
 					// to regex into the post content and grab all blocks of
 					// the type we're looking for
-					preg_match_all("/(<!-- wp:" . str_replace("/", "\/", $block_instance['blockName']) . " .*?\/-->)/s", $page->post_content, $matches);
+					if( false !== strpos($page_block_name, 'core/' ) ) {
+						$simplified_name = str_replace("core/", "", $block_instance['blockName']);
+						preg_match_all("/(<!-- wp:" . $simplified_name . " .*?\/wp:" . $simplified_name . " -->)/s", $page->post_content, $matches);
+					} else {
+						preg_match_all("/(<!-- wp:" . str_replace("/", "\/", $block_instance['blockName']) . " .*?\/-->)/s", $page->post_content, $matches);
+					}
 
 					$block_markup = '';
 
@@ -152,6 +157,7 @@ class Page_Generation {
 		            	$core_block_names = wp_list_pluck( $core_blocks, 'name', null );
 
 						if( ! in_array($page_block_name, $core_block_names ) ) {
+
 							$core_blocks[] = [
 								'name'        => $page_block_name,
 								'markup'      => $block_markup,
@@ -171,7 +177,7 @@ class Page_Generation {
 			}
 
 			$core_blocks[] = [
-				'name'        => 'core/heading',
+				'name'        => '',
 				'markup'      => '<!-- wp:heading --><h1 style="text-decoration: underline;">Custom Blocks</h1><!-- /wp:heading -->',
 				'page'        => -1,
 				'other_pages' => []
